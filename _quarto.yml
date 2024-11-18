@@ -6,11 +6,11 @@ execute:
   echo: true
 
 book:
-  title: "YOUR PROJECT TITLE"
+  title: "nypd-arrest-visualization"
   author:
-    - AUTHOR1 (UNI1)
-    - AUTHOR2 (UNI2)
-  repo-url: https://github.com/YOUR_GITHUB_ACCOUNT/REPO_NAME
+    - Ke Jin (kj2675)
+    - Siming Xu (sx2392)
+  repo-url: https://github.com/99ning/nypd-arrest-visualization
   date: today
   page-footer:
     right: |
