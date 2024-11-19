@@ -1,6 +1,8 @@
 # Introduction
 As new students in NYC, we are keenly aware of the importance of staying informed about local crime and safety, especially through Clery Crime Alerts provided by Columbia University. In addition, the university frequently offers resources like free self-defense classes and situational awareness events, underscoring the need to understand and navigate the environment we live in. This motivated us to explore NYC's arrest data to gain deeper insights about the trend and distributions across the city. 
 
-Our project focuses on visualizing and analyzing key patterns in NYPD arrest data from January to September 2024. Specifically, we aim to:
+Our project focuses on visualizing and analyzing key patterns in NYPD arrest data from January to September 2024. Specifically, we aim to:  
+
 1. Examine overall crime patterns during this period.
 2. Investigate the distribution of crimes across police boroughs, precincts, and demographic categories such as perpetrators’ age group, sex, and race.
+
