@@ -9,3 +9,58 @@
   
   The dataset is available in CSV format on the NYC OpenData portal, which can be directly exported, downloaded locally, and imported into RStudio using the read.csv() function.
 ## Missing value analysis
+```{r message=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(naniar)
+```
+
+```{r}
+data <- read.csv("NYPD_Arrest_Data.csv", na.strings = c("(null)", "N/A"))
+missing_summary <- data |>
+  summarise(across(everything(), ~ sum(is.na(.)))) |>
+  pivot_longer(cols = everything(), names_to = "Column", values_to = "Missing_Values") |>
+  arrange(desc(Missing_Values)) |>
+  mutate(Column = factor(Column, levels = Column)) |>
+  mutate(Proportion = Missing_Values / nrow(data)) 
+  
+ggplot(missing_summary, aes(x = Column, y = Missing_Values)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  labs(title = "Missing Values by Column", x = "Columns", y = "Number of Missing Values") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(
+    name = "Number of Missing Values",
+    sec.axis = sec_axis(~ . / nrow(data) * 100, name = "Proportion of Missing Values (%)")
+  )
+```
+
+```{r}
+data_with_na <- data |>
+  filter(if_any(everything(), is.na))
+
+boro_na_summary <- data_with_na |>
+  group_by(ARREST_BORO) |>
+  summarise(Missing_Count = n()) |>
+  arrange(desc(Missing_Count)) |>
+  mutate(ARREST_BORO = case_when(
+    ARREST_BORO == "B" ~ "Bronx",
+    ARREST_BORO == "S" ~ "Staten Island",
+    ARREST_BORO == "K" ~ "Brooklyn",
+    ARREST_BORO == "M" ~ "Manhattan",
+    ARREST_BORO == "Q" ~ "Queens"
+  )) |>
+  mutate(ARREST_BORO = factor(ARREST_BORO, levels = ARREST_BORO))
+  
+ggplot(boro_na_summary, aes(x = ARREST_BORO, y = Missing_Count)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  labs(title = "Missing Data by Borough", x = "Arrest Borough", y = "Count of Missing Rows") +
+  theme_minimal()
+```
+```{r}
+vis_miss(data_with_na) +
+  labs(title = "Heatmap of Missing Data", x = "Columns", y = "Rows")
+
+```
+
+
