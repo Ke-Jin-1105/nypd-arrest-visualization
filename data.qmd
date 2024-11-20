@@ -1,5 +1,11 @@
 # Data
 
 ## Description
+  The data source for this project is the "NYPD Arrest Data (Year to Date)" dataset, available through NYC OpenData. This data is collected by the New York Police Department (NYPD) and is reviewed by the Office of Management Analysis and Planning. Each record represents an arrest made in NYC by the NYPD, including details such as the type of crime, location, time of enforcement, and perpetrator's demographics. 
 
+  The data is in tabular format, consisting of 19 columns and approximately 195,000 rows, and is manually updated every quarter, with the data format including both numerical and text categorical fields. The available attachment, "NYPD_Arrest_YTD_DataDictionary.xlsx," contains a detailed description of each variable. 
+  
+  However, the dataset has several potential issues, including inconsistencies or delays due to manual updates, and outdated entries because of the quarterly update frequency. Null values are frequently present in certain fields, as some specific data were not collected or were unknown at the time of the report. Additionally, geo-location inaccuracies may affect spatial analysis since some arrests are represented by approximate coordinates. 
+  
+  The dataset is available in CSV format on the NYC OpenData portal, which can be directly exported, downloaded locally, and imported into RStudio using the read.csv() function.
 ## Missing value analysis
