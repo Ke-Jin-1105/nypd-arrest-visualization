@@ -4,10 +4,3 @@ As new students in NYC, we are constantly exposed to crime-related updates throu
 
 Our primary focus is to analyze and highlight the crime frequency distribution across precincts in NYC from January to September 2024, as understanding these geographical patterns is crucial for identifying areas with higher or lower crime rates. Additionally, we aim to uncover temporal trends in arrests, such as fluctuations by month or time of day, to better understand when crimes are more likely to occur. Furthermore, we seek to identify the most prevalent types of crimes and examine how these vary across demographic groups, including age, sex, and race, to provide a comprehensive view of NYC’s crime dynamics.
 
-# first version
-This dataset captures detailed information about arrests, including crime types, locations, times, and perpetrator demographics. By analyzing this data, we aim to investigate and visualize several key questions: 
-
-1. What are the overall crime patterns in NYC from January to September 2024?
-2. How are crimes distributed across police boroughs, precincts, and demographic categories such as age, sex, and race?
-3. Are there discernible temporal trends in arrests, such as variations by month or time of day?
-4. What are the most common types of crimes, and how do these vary geographically and demographically?
