@@ -1,1 +1,159 @@
 # Results
+```{r}
+# required libraries
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(ggalluvial)
+library(patchwork)
+library(vcd)
+library(forcats)
+library(RColorBrewer)
+```
+
+```{r}
+# Read in data and data cleaning
+data <- read.csv("NYPD_Arrest_Data.csv", na.strings = c("(null)", "N/A"))
+data <- na.omit(data)
+```
+
+```{r}
+data <- data |>
+  mutate(ARREST_BORO = case_when(
+    ARREST_BORO == "B" ~ "Bronx",
+    ARREST_BORO == "S" ~ "Staten Island",
+    ARREST_BORO == "K" ~ "Brooklyn",
+    ARREST_BORO == "M" ~ "Manhattan",
+    ARREST_BORO == "Q" ~ "Queens"
+  )) |>
+  mutate(LAW_CAT_CD = case_when(
+    LAW_CAT_CD == "F" ~ "Felony",
+    LAW_CAT_CD == "M" ~ "Misdemeanor",
+    LAW_CAT_CD == "V" ~ "Violation",
+    .default = NA
+  )) |>
+  mutate(JURISDICTION_CODE = case_when(
+    JURISDICTION_CODE == 0 ~ "Patrol",
+    JURISDICTION_CODE == 1 ~ "Transit",
+    JURISDICTION_CODE == 2 ~ "Housing",
+    .default = "Non NYPD"
+  )) |>
+  mutate(PERP_SEX = case_when(
+    PERP_SEX == "F" ~ "Female",
+    PERP_SEX == "M" ~ "Male"
+  ))
+```
+
+Crime frequency distribution across precincts in NYC: 
+
+2. Overall demographic distribution of arrests:
+```{r}
+age_count <- data |>
+  group_by(AGE_GROUP) |>
+  summarize(Count = n())
+
+plot1 <- ggplot(age_count, aes(x = AGE_GROUP, y = Count)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  ggtitle("Number of Arrests by Age group") +
+  xlab("Perp Age Group") +
+  ylab("Number of Arrests")
+
+gender_counts <- data |>
+  group_by(PERP_SEX) |>
+  summarize(Count = n()) |>
+  mutate(Percentage = Count / sum(Count) * 100,
+         Label = paste0(PERP_SEX, " ", round(Percentage, 1), "%"),
+         Position = cumsum(Count) - Count / 2)
+
+plot2 <- ggplot(gender_counts, aes(x = 2, y = Count, fill = PERP_SEX)) +
+  geom_bar(stat = "identity", width = 1, color = "white") +
+  coord_polar("y", start = 0) +
+  labs(title = "Perp Gender") +
+  theme_void() +
+  scale_fill_manual(values = c("steelblue", "lightblue")) +
+  geom_text(aes(x = 3, y = Position, label = Label), color = "black", size = 5) + 
+  theme(legend.position = "none") + xlim(0.5, 3)
+
+race_count <- data |>
+  group_by(PERP_RACE) |>
+  summarize(Count = n()) |>
+  arrange(desc(Count))
+
+plot3 <- ggplot(race_count, aes(x = reorder(PERP_RACE, -Count), y = Count)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  ggtitle("Number of Arrests by PERP_RACE") +
+  xlab("PERP_RACE") +
+  ylab("Number of Arrests") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+top_15_ofns_desc <- data |>
+  group_by(OFNS_DESC) |>
+  summarise(Count = n()) |>
+  arrange(desc(Count)) |>
+  head(15)
+
+plot4 <- ggplot(top_15_ofns_desc, aes(x = reorder(OFNS_DESC, Count), 
+                                      y = Count)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  labs(title = "Top 15 Arrest Categories",
+       x = "Offense Description", y = "Number of Arrests") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  coord_flip()
+```
+
+```{r}
+layout <- "\nABD\nCCD"
+
+(plot1 + plot2 + plot3) + plot4 + plot_layout(design = layout, widths = c(1, 1))
+```
+
+This plot provides a comprehensive overview of demographic patterns and crime-related data. The top-left plot displays the distribution of arrests by age group, revealing that individuals aged `25-44` represent the highest proportion of arrests, followed by the `18-24` and `45-64` age groups. The pie chart at the top-right illustrates the gender distribution of arrests, with males accounting for a dominant 82.1% of all arrests, compared to 17.9% for females. The bottom-left plot focuses on the perpetrator’s race description, showing that `Black` individuals are most frequently arrested, followed by `White Hispanics`, `Black Hispanics`, and other racial categories. Finally, the bar chart on the bottom-right lists the top 15 offense categories, where `Assault 3 & Related Offenses` leads, followed by `Petit Larceny` and `Felony Assault`.
+
+```{r}
+alluvia_data <- na.omit(data) |> 
+  filter(!(PERP_RACE %in% c("UNKNOWN", "AMERICAN INDIAN/ALASKAN NATIVE"))) |>
+  group_by(PERP_SEX, PERP_RACE, AGE_GROUP) |>
+  summarise(Count = n(), .groups = "drop") |>
+  rename(Sex = PERP_SEX, Race = PERP_RACE, AgeGroup = AGE_GROUP)
+
+ggplot(alluvia_data, aes(axis1 = Sex, axis2 = Race, 
+                         axis3 = AgeGroup, y = Count)) +
+  geom_alluvium(aes(fill = Race), width = 0.2, alpha = 0.8) +
+  geom_stratum(width = 0.2, fill = "lightgrey", color = "black") +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum)), size = 2) +
+  scale_x_discrete(limits = c("Sex", "Race", "AgeGroup"), expand = c(0.1, 0.1)) +
+  theme_minimal() +
+  scale_fill_brewer(type='qual') + 
+  labs(title = "Flow of Arrests by Demographics",
+       x = "Demographic Categories",
+       y = "Number of Arrests", fill = "Race")
+```
+
+Among Black females, the majority of arrests are concentrated in the 25-44 age group, with a smaller proportion in the 18-24 and 45-64 age groups. Arrests of Black females under 18 or over 65 are minimal.
+
+```{r}
+# data1 <- data |> filter(!is.na(LAW_CAT_CD)) |> 
+#   filter(!(PERP_RACE %in% c("UNKNOWN", "AMERICAN INDIAN/ALASKAN NATIVE"))) |>
+#   filter(!LAW_CAT_CD %in% c("Violation")) |>
+#   mutate(ARREST_BORO = as.factor(ARREST_BORO),
+#          LAW_CAT_CD = as.factor(LAW_CAT_CD),
+#          PERP_RACE = as.factor(PERP_RACE))
+
+mosaic_data <- data |> filter(!is.na(LAW_CAT_CD)) |> 
+  filter(!(PERP_RACE %in% c("UNKNOWN", "AMERICAN INDIAN/ALASKAN NATIVE")))
+
+fill_colors <- RColorBrewer::brewer.pal(3, "Blues")
+
+# Generate the mosaic plot
+mosaic(LAW_CAT_CD ~ ARREST_BORO + PERP_RACE, data = mosaic_data,
+       labeling_args = list(
+         set_varnames = c(
+           ARREST_BORO = "Borough", 
+           PERP_RACE = "Race", 
+           LAW_CAT_CD = "Offense Level"
+         )),
+       direction = c("v","h","h"),
+       highlighting_fill = fill_colors,
+       main = "Mosaic Plot: Borough, Race, and Offense Level")
+```
+
