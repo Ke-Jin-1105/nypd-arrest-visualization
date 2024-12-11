@@ -1,1 +1,240 @@
 # Results
+```{r message=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(naniar)
+library(ggmap)
+library(lubridate)
+library(sf)
+library(dygraphs)
+library(xts)
+library(ggiraph)
+library(sf)
+
+```
+
+```{r}
+data <- read.csv("NYPD_Arrest_Data.csv", na.strings = c("(null)", "N/A"))
+```
+
+
+```{r}
+### Data Preprocessing step
+data <- na.omit(data)
+data$ARREST_DATE <- as.Date(data$ARREST_DATE, format = "%m/%d/%Y")
+data <- data |>
+  mutate(ARREST_BORO = case_when(
+    ARREST_BORO == "B" ~ "Bronx",
+    ARREST_BORO == "S" ~ "Staten Island",
+    ARREST_BORO == "K" ~ "Brooklyn",
+    ARREST_BORO == "M" ~ "Manhattan",
+    ARREST_BORO == "Q" ~ "Queens"
+  )) 
+
+```
+
+```{r}
+daily_data <- data |>
+  group_by(ARREST_DATE) |>
+  summarise(Count = n(), .groups = "drop")
+
+
+ggplot(daily_data, aes(x = ARREST_DATE, y = Count)) +
+  geom_line(size = 0.8, alpha = 0.8) +
+  labs(
+    title = "Daily NYPD Arrests",
+    subtitle = "From January 1st to September 30th",
+    x = "Date",
+    y = "Number of Arrests",
+    color = "Borough"
+  ) +
+  scale_x_date(date_breaks = "2 week", date_labels = "%b %d") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 12),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
+```
+
+```{r}
+data <- data |>
+  mutate(Weekday = wday(ARREST_DATE, label = TRUE, abbr = TRUE))  
+
+weekday_summary <- data |>
+  group_by(ARREST_DATE, Weekday) |>
+  summarise(Count = n(), .groups = "drop")  
+
+ggplot(weekday_summary, aes(x = ARREST_DATE, y = Count, group = Weekday, fill = Count)) +
+  geom_area(alpha = 0.8) +  
+  geom_line(size = 1, color = "black") +  
+  facet_grid(Weekday ~ ., scales = "fixed", switch = "y") +  
+  scale_fill_gradient(
+    low = "lightblue",  
+    high = "darkblue",  
+    name = "Arrest Count"  
+  ) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  labs(
+    title = "Daily NYPD Arrests by Weekday",
+    x = "Date",
+    y = "Number of Arrests"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1), 
+    strip.text.y.left = element_text(angle = 0),      
+    strip.placement = "outside",                     
+    legend.position = "right"                    
+  )
+```
+
+
+```{r}
+daily_summary_by_borough <- data |>
+  group_by(ARREST_DATE, ARREST_BORO) |>
+  summarise(Count = n(), .groups = "drop")
+
+wide_data <- tidyr::pivot_wider(daily_summary_by_borough, 
+                                names_from = ARREST_BORO, 
+                                values_from = Count, 
+                                values_fill = 0)
+
+wide_data$ARREST_DATE <- as.Date(wide_data$ARREST_DATE)
+
+time_series_obj <- xts(wide_data[,-1], order.by = wide_data$ARREST_DATE)
+
+custom_colors <- c(
+  "Bronx" = "#E7298A",    
+  "Brooklyn" = "#6495ED", 
+  "Manhattan" = "#E6AB02",
+  "Queens" = "#66A61E",   
+  "Staten Island" = "#7570B3" 
+)
+
+dygraph(time_series_obj, main = "Daily NYPD Arrests") |>
+  dyAxis("y", label = "Number of Arrests", valueRange = c(0, 400)) |>
+  dyAxis("x", label = "Date") |>
+  dyRangeSelector() |>
+  dyLegend(width = 300, labelsSeparateLines = TRUE) |>
+  dyOptions(colors = unname(custom_colors), strokeWidth = 2, gridLineColor = "#DDDDDD") 
+
+```
+
+```{r fig.width = 12}
+daily_summary_by_borough <- data |>
+  group_by(ARREST_DATE, ARREST_BORO) |>
+  summarise(Count = n(), .groups = "drop")
+
+ggplot(daily_summary_by_borough, aes(x = ARREST_DATE, y = Count, color = ARREST_BORO)) +
+  geom_line(size = 0.8, alpha = 0.8) +
+  labs(
+    title = "Daily NYPD Arrests",
+    subtitle = "From January 1st to September 30th",
+    x = "Date",
+    y = "Number of Arrests",
+    color = "Borough"
+  ) +
+  scale_x_date(date_breaks = "2 week", date_labels = "%b %d") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 12),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
+```
+
+```{r fig.width = 12}
+weekly_summary_by_borough <- data |>
+  mutate(Week = floor_date(ARREST_DATE, unit = "week")) |>  # Create a 'Week' column
+  group_by(Week, ARREST_BORO) |>                           # Group by week and borough
+  summarise(Count = n(), .groups = "drop") 
+max_week <- max(weekly_summary_by_borough$Week)
+weekly_summary_filtered <- weekly_summary_by_borough |>
+  filter(Week < max_week)
+
+ggplot(weekly_summary_filtered, aes(x = Week, y = Count, color = ARREST_BORO)) +
+  geom_line(size = 1, alpha = 0.8) +
+  scale_x_date(date_breaks = "2 week", date_labels = "%b %d") + # Weekly x-axis labels
+  labs(
+    title = "Weekly NYPD Arrests",
+    subtitle = "From January 1st to September 30th",
+    x = "Week",
+    y = "Number of Arrests",
+    color = "Borough"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 12),
+    axis.text.x = element_text(angle = 45, hjust = 1), # Rotate x-axis labels
+    axis.title.x = element_text(size = 14),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
+```
+
+
+```{r fig.height=10, fig.width=10}
+nyc_sf <- read_sf("new-york-city-boroughs.geojson")
+data <- data |>
+  filter(Longitude != 0 & Latitude != 0)
+arrest_sf <- st_as_sf(data, coords = c("Longitude", "Latitude"), crs = 4326)
+
+borough_arrest_count <- arrest_sf |>
+  st_drop_geometry() |>
+  group_by(ARREST_BORO) |>
+  summarise(total_arrests = n())
+
+nyc_sf <- nyc_sf |>
+  left_join(borough_arrest_count, by = c("name" = "ARREST_BORO")) |>
+  mutate(tooltip = paste(name, "<br>Total Arrests:", total_arrests))
+
+interactive_map <- ggplot() +
+  geom_sf_interactive(
+    data = nyc_sf,
+    aes(fill = name, geometry = geometry, tooltip = tooltip),
+    color = "black",
+    size = 0.3,
+    alpha = 0.5
+  ) +
+  geom_sf(
+    data = arrest_sf,
+    aes(geometry = geometry),
+    color = "red",
+    size = 0.05,
+    alpha = 0.4,
+    stroke = 0.3,
+    shape = 1
+  ) +
+  labs(
+    title = "Arrest Locations in NYC",
+    x = "Longitude",
+    y = "Latitude",
+    fill = "Borough"
+  ) +
+  coord_sf() +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 12, face = "italic"),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10),
+    plot.margin = margin(1, 1, 1, 1, "cm")
+  )
+
+girafe(ggobj = interactive_map)
+
+```
+
+
+
+
+
+
