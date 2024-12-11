@@ -12,12 +12,14 @@ library(RColorBrewer)
 ```
 
 ```{r}
-# Read in data and data cleaning
+# Read in data
 data <- read.csv("NYPD_Arrest_Data.csv", na.strings = c("(null)", "N/A"))
-data <- na.omit(data)
 ```
 
 ```{r}
+### Data Preprocessing step
+data <- na.omit(data)
+data$ARREST_DATE <- as.Date(data$ARREST_DATE, format = "%m/%d/%Y")
 data <- data |>
   mutate(ARREST_BORO = case_when(
     ARREST_BORO == "B" ~ "Bronx",
@@ -45,6 +47,30 @@ data <- data |>
 ```
 
 Crime frequency distribution across precincts in NYC: 
+```{r}
+daily_data <- data |>
+  group_by(ARREST_DATE) |>
+  summarise(Count = n(), .groups = "drop")
+
+ggplot(daily_data, aes(x = ARREST_DATE, y = Count)) +
+  geom_line(size = 0.8, alpha = 0.8) +
+  labs(
+    title = "Daily NYPD Arrests",
+    subtitle = "From January 1st to September 30th",
+    x = "Date",
+    y = "Number of Arrests",
+    color = "Borough"
+  ) +
+  scale_x_date(date_breaks = "2 week", date_labels = "%b %d") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 12),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
+```
 
 2. Overall demographic distribution of arrests:
 ```{r}
