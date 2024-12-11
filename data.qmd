@@ -52,13 +52,13 @@ boro_na_summary <- data_with_na |>
   group_by(ARREST_BORO) |>
   summarise(Missing_Count = n()) |>
   arrange(desc(Missing_Count)) |>
-  mutate(ARREST_BORO = case_when(
-    ARREST_BORO == "B" ~ "Bronx",
-    ARREST_BORO == "S" ~ "Staten Island",
-    ARREST_BORO == "K" ~ "Brooklyn",
-    ARREST_BORO == "M" ~ "Manhattan",
-    ARREST_BORO == "Q" ~ "Queens"
-  )) |>
+    mutate(ARREST_BORO = case_when(
+      ARREST_BORO == "B" ~ "Bronx",
+      ARREST_BORO == "S" ~ "Staten Island",
+      ARREST_BORO == "K" ~ "Brooklyn",
+      ARREST_BORO == "M" ~ "Manhattan",
+      ARREST_BORO == "Q" ~ "Queens"
+    )) |>
   mutate(ARREST_BORO = factor(ARREST_BORO, levels = ARREST_BORO))
   
 ggplot(boro_na_summary, aes(x = ARREST_BORO, y = Missing_Count)) +

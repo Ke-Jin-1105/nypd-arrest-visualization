@@ -282,13 +282,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ARREST_BORO) <span class="sc">|&gt;</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Missing_Count =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Missing_Count)) <span class="sc">|&gt;</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ARREST_BORO =</span> <span class="fu">case_when</span>(</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    ARREST_BORO <span class="sc">==</span> <span class="st">"B"</span> <span class="sc">~</span> <span class="st">"Bronx"</span>,</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    ARREST_BORO <span class="sc">==</span> <span class="st">"S"</span> <span class="sc">~</span> <span class="st">"Staten Island"</span>,</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    ARREST_BORO <span class="sc">==</span> <span class="st">"K"</span> <span class="sc">~</span> <span class="st">"Brooklyn"</span>,</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    ARREST_BORO <span class="sc">==</span> <span class="st">"M"</span> <span class="sc">~</span> <span class="st">"Manhattan"</span>,</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    ARREST_BORO <span class="sc">==</span> <span class="st">"Q"</span> <span class="sc">~</span> <span class="st">"Queens"</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">ARREST_BORO =</span> <span class="fu">case_when</span>(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>      ARREST_BORO <span class="sc">==</span> <span class="st">"B"</span> <span class="sc">~</span> <span class="st">"Bronx"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>      ARREST_BORO <span class="sc">==</span> <span class="st">"S"</span> <span class="sc">~</span> <span class="st">"Staten Island"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      ARREST_BORO <span class="sc">==</span> <span class="st">"K"</span> <span class="sc">~</span> <span class="st">"Brooklyn"</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>      ARREST_BORO <span class="sc">==</span> <span class="st">"M"</span> <span class="sc">~</span> <span class="st">"Manhattan"</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>      ARREST_BORO <span class="sc">==</span> <span class="st">"Q"</span> <span class="sc">~</span> <span class="st">"Queens"</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">|&gt;</span></span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ARREST_BORO =</span> <span class="fu">factor</span>(ARREST_BORO, <span class="at">levels =</span> ARREST_BORO))</span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(boro_na_summary, <span class="fu">aes</span>(<span class="at">x =</span> ARREST_BORO, <span class="at">y =</span> Missing_Count)) <span class="sc">+</span></span>
