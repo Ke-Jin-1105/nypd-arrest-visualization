@@ -1,5 +1,4 @@
 # Results
-
 ```{r message=FALSE, warning=FALSE}
 library(viridis)
 library(leaflet)
@@ -109,21 +108,24 @@ plot4 <- ggplot(top_15_ofns_desc, aes(x = reorder(OFNS_DESC, Count),
                                       y = Count)) +
   geom_bar(stat = "identity", fill = "lightblue") +
   labs(title = "Top 15 Arrest Categories",
-       x = "Offense Description", y = "Number of Arrests") + 
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+       x = "Offense Description", y = "Number of Arrests") +
   coord_flip()
 layout <- "\nABD\nCCD"
 (plot1 + plot2 + plot3) + plot4 + plot_layout(design = layout, widths = c(1, 1))
 ```
 
-This plot provides a comprehensive overview of demographic patterns and crime-related data. The top-left plot displays the distribution of arrests by age group, revealing that individuals aged 25-44 represent the highest proportion of arrests, followed by the 18-24 and 45-64 age groups. The pie chart at the top-right illustrates the gender distribution of arrests, with males accounting for a dominant 82.1% of all arrests, compared to 17.9% for females. The bottom-left plot focuses on the perpetrator’s race description, showing that Black individuals are most frequently arrested, followed by White Hispanics, Black Hispanics, and other racial categories. Finally, the bar chart on the bottom-right lists the top 15 offense categories, where Assault 3 & Related Offenses leads, followed by Petit Larceny and Felony Assault.
+This plot provides a comprehensive overview of demographic patterns and crime-related data. 
+- The top-left plot displays the distribution of arrests by age group, revealing that individuals aged 25-44 represent the highest proportion of arrests, followed by the 18-24 and 45-64 age groups. 
+- The pie chart at the top-right illustrates the gender distribution of arrests, with males accounting for a dominant 82.1% of all arrests, compared to 17.9% for females. 
+- The bottom-left plot focuses on the perpetrator’s race description, showing that Black individuals are most frequently arrested, followed by White Hispanics, Black Hispanics, and other racial categories. 
+- Finally, the bar chart on the bottom-right lists the top 15 offense categories, where Assault 3 & Related Offenses leads, followed by Petit Larceny and Felony Assault.
 
 For the demographic section, it is important to note that the racial categories “Unknown” and “American Indian/Alaskan Native” represent a very small proportion of the overall arrests. Therefore, these groups are excluded from the analysis to focus on the more predominant racial categories.
 
 The demographic distribution chart offers a foundational understanding of the patterns observed in arrests. However, to delve deeper into the interplay between these demographic factors and their combined influence on arrest patterns, the alluvial flow chart offers a more dynamic and interconnected perspective. It allows us to visualize how different demographic categories, such as gender and race, flow into specific age groups, revealing hidden relationships within the data.
 
 ### Flow of Arrests by Demographics
-```{r fig.width=12}
+```{r fig.height=8, fig.width=12}
 alluvia_data <- na.omit(data) |> 
   filter(!(PERP_RACE %in% c("UNKNOWN", "AMERICAN INDIAN/ALASKAN NATIVE"))) |>
   group_by(PERP_SEX, PERP_RACE, AGE_GROUP) |>
@@ -143,12 +145,12 @@ ggplot(alluvia_data, aes(axis1 = Sex, axis2 = Race,
        y = "Number of Arrests", fill = "Race")
 ```
 
-The majority of arrests are attributed to males, spanning across all racial and age categories. Among males, Black individuals dominate the arrest counts, with a significant portion falling into the 25-44 age group, followed by the 18-24 and 45-64 age group. A similar pattern is seen among females, though their overall arrest counts are much lower. Black females also primarily fall into the 25-44 age group, with much smaller flows to younger and older age groups. White Hispanics and Black Hispanics, the next most frequently arrested groups, also exhibit similar age distributions, with the majority concentrated in the 25-44 age group. Asian/Pacific Islander and White individuals have smaller flows overall, but their arrests also primarily converge in the 25-44 age group. Arrests of individuals under 18 and over 65 are comparatively rare across all racial groups, indicating that crime-related activities are predominantly associated with working-age individuals.
+This Alluvia diagram clearly shows a dominant overrepresentation of Black and white hispanic males, especially in the 25-44 age group, in arrest data. This trend, combined with the overwhelmingly higher number of male arrests across all races, suggests that certain demographics are being disproportionately affected. In contrast, smaller flows from groups like Asian/Pacific Islanders stand out, emphasizing how arrests are concentrated among specific racial and gender groups. These patterns raise important questions about potential systemic issues or societal factors that may be driving these disparities.
 
-Having explored the demographic patterns and their interactions through the alluvial chart, we now turn our attention to investigate further about the relationship between the borough and offence level and race. 
+One significant influence on this disparities may be the areas where individuals reside, as different boroughs often reflect varying living standards, access to resources, and community dynamics. To explore this further, the following section will delve into the arrest distribution across different boroughs, investigating on how geography might play a role in these demographic trends.
 
 ### Mosaic Plot: Borough, Race, and Offense Level
-```{r fig.width=12}
+```{r fig.height=8, fig.width=12}
 mosaic_data <- data |> filter(!is.na(LAW_CAT_CD)) |> 
   filter(!(PERP_RACE %in% c("UNKNOWN", "AMERICAN INDIAN/ALASKAN NATIVE"))) |>
   mutate(LAW_CAT_CD = factor(LAW_CAT_CD, levels = c("Violation", "Misdemeanor", "Felony")))
@@ -169,7 +171,8 @@ mosaic(LAW_CAT_CD ~ ARREST_BORO + PERP_RACE, data = mosaic_data,
        main = "Mosaic Plot: Borough, Race, and Offense Level")
 ```
 
-The mosaic plot reveals that while offense levels show consistent patterns across all boroughs - approximately half of the arrests are for felonies, nearly half are for misdemeanors, and violations constitute only a small proportion - there are striking disparities in the racial composition of arrests across boroughs. Black individuals dominate arrests in most boroughs, particularly in the Bronx and Brooklyn, where their proportions are significantly higher compared to other racial groups. In contrast, White individuals are more frequently arrested in Brooklyn than in the Bronx, showcasing geographical variations in racial arrest patterns. Similarly, White Hispanic and Black Hispanic individuals also show varied distributions across boroughs, with noticeable representation in Brooklyn and Manhattan. Staten Island consistently exhibits the smallest volume of arrests, reflecting its lower population density and distinct enforcement practices. 
+
+The mosaic plot reveals that while offense levels show consistent patterns across all boroughs - approximately half of the arrests are for felonies, nearly half are for misdemeanors, and violations constitute only a small proportion - there are striking disparities in the racial composition of arrests across boroughs, highlighting that borough is statistically significant to race. For instance, Black individuals dominate arrests in the Brooklyn, with proportions notably higher than in other boroughs, indicating a geographic concentration of demographic composition. In contrast, White individuals are more frequently arrested in Staten Island compared to the others, highlighting localized variations in racial arrest patterns. Similarly, White Hispanic and Black Hispanic individuals exhibit different arrest distributions, with greater white Hispanic representation in Brooklyn and Queens, and greater black Hispanic in Bronx and Manhattan. These variations point to the conclusion that the borough of residence plays a significant role in shaping arrest patterns across racial groups.
 
 For the next section, we aim to find out the overall geographical patterns. 
 
@@ -215,36 +218,12 @@ Manhattan follows with 46,226 arrests, heavily concentrated in its central and s
 
 Queens accounts for 42,969 arrests, characterized by a more dispersed pattern with prominent clusters in neighborhoods like Jamaica and Flushing. The suburban nature of Queens contrasts with the dense urban dynamics of Manhattan and the Bronx. Staten Island, with only 8,341 arrests, has the lowest crime figures, reflecting its smaller population and suburban characteristics, with most arrests concentrated in the northern part of the borough.
 
-To build on the borough-level insights, the precinct-level analysis provides a finer-grained view of arrest distributions across New York City.
+Building on the borough-level insights, the precinct-level analysis provides a finer-grained view of arrest distributions across New York City.
 
 ### Arrests by Police Precinct in NYC
-```{r}
-# nyc_precincts <- st_read("Police Precincts.geojson")
-# nyc_precincts$precinct <- as.integer(nyc_precincts$precinct)
-# 
-# # Aggregate arrests by precinct
-# precinct_arrests <- data |>
-#   group_by(ARREST_PRECINCT) |>
-#   summarise(Count = n())
-# 
-# # Merge arrest data with precinct shapefile
-# precinct_arrests_map <- nyc_precincts |>
-#   left_join(precinct_arrests, by = c("precinct" = "ARREST_PRECINCT"))
-# 
-# # Plot precinct-level arrests
-# ggplot(data = precinct_arrests_map) +
-#   geom_sf(aes(fill = Count), color = "white") +
-#   scale_fill_viridis_c() +
-#   labs(
-#     title = "Arrests by Police Precinct in NYC",
-#     fill = "Number of Arrests"
-#   ) +
-#   theme_minimal()
-```
-
-```{r warning=FALSE, message=FALSE, fig.width=12, fig.height=8}
-boroughs <- st_read("new-york-city-boroughs.geojson")
-precincts <- st_read("Police Precincts.geojson")
+```{r message=FALSE, fig.width=12, fig.height=8}
+boroughs <- read_sf("new-york-city-boroughs.geojson")
+precincts <- read_sf("Police Precincts.geojson")
 boroughs <- st_make_valid(boroughs)
 precincts <- st_make_valid(precincts)
 boroughs <- st_transform(boroughs, crs = st_crs(precincts))
@@ -267,8 +246,10 @@ precincts_with_boroughs <- precincts_with_boroughs |>
     "<strong>Number of Arrests: </strong>", Count
   ))
 
-pal <- colorNumeric(palette = rev(viridis::viridis_pal()(256)),
-                    domain = precincts_with_boroughs$Count)
+pal <- colorNumeric(
+  palette = "Reds", 
+  domain = precincts_with_boroughs$Count
+)
 leaflet(precincts_with_boroughs) |>
   addProviderTiles("OpenStreetMap") |>
   addPolygons(fillColor = ~pal(Count), weight = 1, opacity = 1, color = "white",
