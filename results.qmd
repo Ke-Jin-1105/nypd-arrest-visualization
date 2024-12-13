@@ -264,6 +264,7 @@ leaflet(precincts_with_boroughs) |>
             title = "Number of Arrests", position = "topright")
 ```
 
+
 The precinct map highlights significant variation in arrest numbers within boroughs, revealing areas of concentrated activity. Notably, precincts in Brooklyn and Manhattan exhibit some of the highest arrest counts, with certain northern and central precincts in Brooklyn and Manhattan dominating the map. These areas align with dense urban neighborhoods characterized by high population and commercial activity. In contrast, precincts in Staten Island consistently show the lowest arrest counts, reinforcing its suburban character. The map also highlights pockets of high arrests in Queens and the Bronx, particularly in precincts associated with well-known urban hubs like Jamaica and the South Bronx. This spatial breakdown underscores the importance of precinct-level data in understanding localized crime dynamics, enabling targeted interventions and resource allocation.
 
 ## Temporal Patterns of Crime in NYC
@@ -274,7 +275,7 @@ daily_data <- data |>
   summarise(Count = n(), .groups = "drop")
   
 ggplot(daily_data, aes(x = ARREST_DATE, y = Count)) +
-  geom_line(size = 0.8, alpha = 0.8) +
+  geom_line(linewidth = 0.8, alpha = 0.8) +
   labs(title = "Daily NYPD Arrests",
        subtitle = "From January 1st to September 30th",
        x = "Date", y = "Number of Arrests", color = "Borough") +
@@ -298,7 +299,7 @@ weekday_summary <- data |>
 ggplot(weekday_summary, aes(x = ARREST_DATE, y = Count, 
                             group = Weekday, fill = Count)) +
   geom_area(alpha = 0.8) +  
-  geom_line(size = 1, color = "black") +  
+  geom_line(linewidth = 1, color = "black") +  
   facet_grid(Weekday ~ ., scales = "fixed", switch = "y") +  
   scale_fill_gradient(low = "lightblue", high = "darkblue", 
                       name = "Arrest Count") +
@@ -328,7 +329,7 @@ daily_arrest_data <- daily_summary_by_borough |>
 write_json(daily_arrest_data, "daily_arrest_data.json", pretty = TRUE)
 
 ggplot(daily_summary_by_borough, aes(x = ARREST_DATE, y = Count, color = ARREST_BORO)) +
-  geom_line(size = 0.8, alpha = 0.8) +
+  geom_line(linewidth = 0.8, alpha = 0.8) +
   labs(
     title = "Daily NYPD Arrests by Borough",
     subtitle = "From January 1st to September 30th",
