@@ -20,6 +20,7 @@ library(vcd)
 library(forcats)
 library(RColorBrewer)
 library(devtools)
+library(jsonlite)
 # Read in data
 data <- read.csv("NYPD_Arrest_Data.csv", na.strings = c("(null)", "N/A"))
 # Data Preprocessing step
@@ -340,6 +341,11 @@ daily_summary_by_borough <- data |>
   group_by(ARREST_DATE, ARREST_BORO) |>
   summarise(Count = n(), .groups = "drop")
 
+daily_arrest_data <- daily_summary_by_borough |>
+  select(ARREST_DATE, ARREST_BORO, Count) |>
+  rename(date = ARREST_DATE, borough = ARREST_BORO, count = Count)
+write_json(daily_arrest_data, "daily_arrest_data.json", pretty = TRUE)
+
 ggplot(daily_summary_by_borough, aes(x = ARREST_DATE, y = Count, color = ARREST_BORO)) +
   geom_line(size = 0.8, alpha = 0.8) +
   labs(
@@ -386,5 +392,5 @@ ggplot(daily_summary_by_borough, aes(x = reorder(ARREST_BORO, -Count, FUN = medi
         legend.text = element_text(size = 10))
 ```
 
-Brooklyn stands out with the highest median weekly arrests and a wider interquartile range, indicating more variability in arrest counts compared to other boroughs. This aligns with its larger population and higher levels of urban activity. Manhattan follows with a slightly lower median but still maintains a wide IQR, indicating variability likely influenced by high urban density and commercial activity. The Bronx and Queens display similar medians, though the Bronx exhibits a slightly narrower IQR, suggesting more consistency in daily arrest figures. Staten Island, on the other hand, shows significantly lower arrests with a tight interquartile range, highlighting its smaller population and suburban characteristics.
+Brooklyn stands out with the highest median daily arrests and a wider interquartile range, indicating more variability in arrest counts compared to other boroughs. This aligns with its larger population and higher levels of urban activity. Manhattan follows with a slightly lower median but still maintains a wide IQR, indicating variability likely influenced by high urban density and commercial activity. The Bronx and Queens display similar medians, though the Bronx exhibits a slightly narrower IQR, suggesting more consistency in daily arrest figures. Staten Island, on the other hand, shows significantly lower arrests with a tight interquartile range, highlighting its smaller population and suburban characteristics.
 
