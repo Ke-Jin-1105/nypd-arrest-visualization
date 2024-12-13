@@ -1,13 +1,75 @@
-# Interactive graph
+# Interactive Graph
+---
+title: "Interactive Graph"
+format: html
+resources:
+  - daily_arrest_data.json
+---
 
 <style>
   * {
     font-family: sans-serif;
   }
-</style> 
+  #tooltip {
+    position: absolute;
+    text-align: left;
+    padding: 8px;
+    font-size: 12px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    pointer-events: none;
+    display: none;
+  }
 
-<div id="plot">
-</div>
+  #buttons-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .borough-button {
+    display: flex;
+    align-items: center;
+    border: 1px solid black;
+    padding: 5px;
+    margin: 2px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+
+  .borough-button.active {
+    background-color: lightgray;
+  }
+  .borough-box {
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+    border: 1px solid black;
+  }
+  
+  .line {
+    fill: none;
+    stroke-width: 2px;
+  }
+
+   #slider-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  #date-slider {
+    width: 80%;
+  }
+</style>
+
+<div id="plot"></div>
+<div id="tooltip"></div>
+<div id="buttons-container"></div>
+<div id="slider-container"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-simple-slider"></script>
 <script src="scripts/myscript.js"></script>
