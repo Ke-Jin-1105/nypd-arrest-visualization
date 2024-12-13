@@ -169,6 +169,8 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<p>From prior analyses, we observed that offense levels remain consistent across all boroughs, with misdemeanors and felonies accounting for the majority of arrests. Black individuals dominate the arrest counts, with the 25-44 age group being the most represented demographic. Temporal trends revealed that weekdays, especially Tuesday and Wednesday, experience the highest arrest counts, while weekends show significantly lower activity. Brooklyn stands out with the highest daily arrests, while Manhattan, the Bronx, and Queens exhibit similar medians. Staten Island consistently reports the lowest arrests. These findings highlight both the spatial and temporal disparities in arrest patterns across NYC.</p>
+<p>The interactive visualization is designed to provide users with a deeper understanding of temporal patterns in NYC arrest trends, focusing on borough-level. By integrating the ability to filter boroughs and adjust the date range, users can explore how arrest counts vary across time and space, revealing meaningful patterns such as weekday peaks, borough-specific trends, and comparisons among boroughs.</p>
 <style>
   * {
     font-family: sans-serif;
@@ -239,12 +241,15 @@ ul.task-list li input[type="checkbox"] {
 <div id="slider-container">
 
 </div>
-<!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/d3-simple-slider"></script> -->
-<!-- <script src="scripts/myscript.js"></script> -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3-simple-slider"></script>
 <script src="scripts/myscript.js"></script>
+<p>Instructions:</p>
+<ol type="1">
+<li>Selecting/Deselecting Boroughs: Use the clickable buttons below the graph to select or deselect specific boroughs. By toggling these options, the time series plot dynamically updates to show data for only the selected boroughs, making it easier to focus on specific areas of interest.</li>
+<li>Adjusting the Date Range: Drag the slider beneath the graph to filter the time series data within a specific date range. This feature enables users to zoom into particular time periods, such as a single month or a few weeks, to identify short-term trends and patterns.</li>
+<li>Exploring Data Points: Hover over any point in the graph to view the exact arrest count for that borough on a specific day. This provides precise details for temporal and spatial comparisons.</li>
+</ol>
 
 
 
